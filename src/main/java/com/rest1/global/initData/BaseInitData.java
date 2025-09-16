@@ -1,5 +1,6 @@
 package com.rest1.global.initData;
 
+import com.rest1.domain.member.member.service.MemberService;
 import com.rest1.domain.post.post.entity.Post;
 import com.rest1.domain.post.post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class BaseInitData {
     @Lazy
     private BaseInitData self;
     private final PostService postService;
+    private final MemberService memberService;
 
     @Bean
     ApplicationRunner initDataRunner() {
@@ -30,12 +32,25 @@ public class BaseInitData {
     }
 
     @Transactional
-    public void work1() {
+    public void work1(){
         if(postService.count() > 0) {
             return;
         }
 
-        Post post1 = postService.write("제목1", "내용1");
+        memberService.join("user1", "user1", "시스템");
+        memberService.join("user2", "user2", "운영자");
+        memberService.join("user3", "user3", "유저1");
+        memberService.join("user4", "user4", "유저2");
+        memberService.join("user5", "user5", "유저3");
+    }
+
+    @Transactional
+    public void work2() {
+        if(postService.count() > 0) {
+            return;
+        }
+
+        Post post1 = postService.write( "제목1", "내용1");
         Post post2 = postService.write("제목2", "내용2");
         Post post3 = postService.write("제목3", "내용3");
 
