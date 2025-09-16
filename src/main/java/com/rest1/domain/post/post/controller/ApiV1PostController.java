@@ -86,10 +86,19 @@ public class ApiV1PostController {
     @Operation(summary = "글 작성")
     public RsData<PostWriteResBody> createItem(
             @RequestBody @Valid PostWriteReqBody reqBody,
-            @RequestParam @NotBlank @Size(min=2, max=30) String username
+            @RequestParam @NotBlank @Size(min=2, max=30) String username,
+            @RequestParam @NotBlank @Size(min = 2, max = 30) String password
     ) {
 
+        //실제 DB에 등록되어있는지 확인하기
         Member actor = memberService.findByUsername(username).get();
+
+        //당신이 그 회원인 증거(비밀번호)를 입력받기
+        if( ! actor.getPassword().equals(password)){
+            //스프링 부트에선 어디선가 문제가 생겨 일처리를 중단하는 경우엔 throw Exception을 쓴다.
+            throw new IllegalArgumentException("createItem에서 터진 예외이며 비밀번호가 틀렸습니다.");
+        }
+
         Post post = postService.write(actor, reqBody.title, reqBody.content);
 
         System.out.println("createItem 메서드 실행");
