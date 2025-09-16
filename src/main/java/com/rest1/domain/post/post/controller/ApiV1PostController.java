@@ -85,10 +85,11 @@ public class ApiV1PostController {
     @Transactional
     @Operation(summary = "글 작성")
     public RsData<PostWriteResBody> createItem(
-            @RequestBody @Valid PostWriteReqBody reqBody
+            @RequestBody @Valid PostWriteReqBody reqBody,
+            @RequestParam @NotBlank @Size(min=2, max=30) String username
     ) {
 
-        Member actor = memberService.findByUsername("user1").get();
+        Member actor = memberService.findByUsername(username).get();
         Post post = postService.write(actor, reqBody.title, reqBody.content);
 
         System.out.println("createItem 메서드 실행");

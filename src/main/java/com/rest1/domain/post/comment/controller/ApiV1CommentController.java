@@ -84,10 +84,11 @@ public class ApiV1CommentController {
     @Operation(summary = "댓글 작성")
     public RsData<CommentWriteResBody> createItem(
             @PathVariable Long postId,
-            @RequestBody @Valid CommentWriteReqBody reqBody
+            @RequestBody @Valid CommentWriteReqBody reqBody,
+            @RequestParam @NotBlank @Size(min = 2, max = 100) String username
     ) {
 
-        Member author = memberService.findByUsername("user1").get();
+        Member author = memberService.findByUsername(username).get();
         Post post = postService.findById(postId).get();
         Comment comment = postService.writeComment(author, post, reqBody.content);
 
