@@ -2,6 +2,7 @@ package com.rest1.domain.member.member.service;
 
 import com.rest1.domain.member.member.entity.Member;
 import com.rest1.domain.member.member.repository.MemberRepository;
+import com.rest1.global.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,13 @@ public class MemberService {
     }
 
     public Member join(String username, String password, String nickname) {
+
+        //username 중복 검증
+        memberRepository.findByUsername(username)
+                .ifPresent((Member m) ->{
+                    throw new ServiceException("409-1", "이미 존재하는 아이디입니다.");
+                });
+        
         Member member = new Member(username, password, nickname);
         return memberRepository.save(member);
     }

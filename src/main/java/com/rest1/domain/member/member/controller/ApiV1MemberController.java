@@ -44,16 +44,10 @@ public class ApiV1MemberController {
 
     }
 
-    @PostMapping()
+    @PostMapping("/join")
     public RsData<JoinResBody> join(
             @RequestBody @Valid JoinReqBody reqBody
     ){
-        memberService.findByUsername(reqBody.username)
-                .ifPresent((Member m) ->{
-                        throw new ServiceException("409-1", "이미 존재하는 아이디입니다.");
-                });
-
-
         Member member = memberService.join(reqBody.username, reqBody.password, reqBody.nickname);
 
         return new RsData<JoinResBody>(
@@ -64,4 +58,49 @@ public class ApiV1MemberController {
                 )
         );
     }
+
+
+    record LoginReqBody( //받아야하는 데이터 (요청용)
+                        @NotBlank
+                        @Size(min=2, max=30)
+                        String username,
+
+                        @NotBlank
+                        @Size(min=2, max=30)
+                        String password
+    ){
+
+    }
+
+    record LoginResBody( //응답용
+        MemberDto memberDto,
+        String apiKey
+    ){
+
+    }
+
+    @PostMapping("/login")
+    public RsData<LoginResBody> login(
+            @RequestBody @Valid LoginReqBody reqBody
+    ){
+
+        Member member = memberService.findByUsername(reqBody.username).orElseThrow(
+                () -> new ServiceException("401-1", "존재하지 않는 아이디입니다.")
+        );
+
+        if( ! member.getPassword().equals(reqBody.password)){
+            throw new ServiceException("401-2", "비밀번호가 일치하지 않습니다.");
+        }
+
+        return new RsData(
+                "200-1",
+                "%s님 환영합니다.".formatted(reqBody.username),
+                new LoginResBody(
+                    new MemberDto(member),
+                    member.getApiKey()
+                )
+
+        );
+    }
+
 }
