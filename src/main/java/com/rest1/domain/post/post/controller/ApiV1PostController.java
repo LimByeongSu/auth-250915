@@ -5,6 +5,7 @@ import com.rest1.domain.member.member.service.MemberService;
 import com.rest1.domain.post.post.dto.PostDto;
 import com.rest1.domain.post.post.entity.Post;
 import com.rest1.domain.post.post.service.PostService;
+import com.rest1.global.exception.ServiceException;
 import com.rest1.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -96,7 +97,7 @@ public class ApiV1PostController {
         //당신이 그 회원인 증거(비밀번호)를 입력받기
         if( ! actor.getPassword().equals(password)){
             //스프링 부트에선 어디선가 문제가 생겨 일처리를 중단하는 경우엔 throw Exception을 쓴다.
-            throw new IllegalArgumentException("createItem에서 터진 예외이며 비밀번호가 틀렸습니다.");
+            throw new ServiceException("401-1", "비밀번호가 틀렸습니다.");
         }
 
         Post post = postService.write(actor, reqBody.title, reqBody.content);
