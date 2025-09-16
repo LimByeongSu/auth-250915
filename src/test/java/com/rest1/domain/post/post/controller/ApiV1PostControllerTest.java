@@ -1,5 +1,7 @@
 package com.rest1.domain.post.post.controller;
 
+import com.rest1.domain.member.member.entity.Member;
+import com.rest1.domain.member.member.repository.MemberRepository;
 import com.rest1.domain.post.post.entity.Post;
 import com.rest1.domain.post.post.repository.PostRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -32,9 +34,14 @@ public class ApiV1PostControllerTest {
     @Autowired
     private PostRepository postRepository;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
     @Test
     @DisplayName("글 다건 조회")
     void t1() throws Exception {
+
+        long targetPostId = 1;
 
         ResultActions resultActions = mvc
                 .perform(
@@ -54,7 +61,9 @@ public class ApiV1PostControllerTest {
                 .andExpect(jsonPath("$[0].createDate").exists())
                 .andExpect(jsonPath("$[0].modifyDate").exists())
                 .andExpect(jsonPath("$[0].title").value("제목3"))
-                .andExpect(jsonPath("$[0].content").value("내용3"));
+                .andExpect(jsonPath("$[0].content").value("내용3"))
+                .andExpect(jsonPath("$[0].authorId").value(4))
+                .andExpect(jsonPath("$[0].authorName").value("유저2"));
 
 
         // 하나 또는 2개 정도만 검증
@@ -94,7 +103,9 @@ public class ApiV1PostControllerTest {
                 .andExpect(jsonPath("$.createDate").value(matchesPattern(post.getCreateDate().toString().replaceAll("0+$", "") + ".*")))
                 .andExpect(jsonPath("$.modifyDate").value(matchesPattern(post.getModifyDate().toString().replaceAll("0+$", "") + ".*")))
                 .andExpect(jsonPath("$.title").value("제목1"))
-                .andExpect(jsonPath("$.content").value("내용1"));
+                .andExpect(jsonPath("$.content").value("내용1"))
+                .andExpect(jsonPath("$.authorId").value(3))
+                .andExpect(jsonPath("$.authorName").value("유저1"));
     }
 
     @Test
@@ -102,6 +113,8 @@ public class ApiV1PostControllerTest {
     void t3() throws Exception {
         String title = "제목입니다";
         String content = "내용입니다";
+
+        Member author = memberRepository.findByUsername("user1").get();
 
         ResultActions resultActions = mvc
                 .perform(
@@ -126,7 +139,9 @@ public class ApiV1PostControllerTest {
                 .andExpect(jsonPath("$.data.postDto.createDate").exists())
                 .andExpect(jsonPath("$.data.postDto.modifyDate").exists())
                 .andExpect(jsonPath("$.data.postDto.title").value(title))
-                .andExpect(jsonPath("$.data.postDto.content").value(content));
+                .andExpect(jsonPath("$.data.postDto.content").value(content))
+                .andExpect(jsonPath("$.data.postDto.authorId").value(author.getId()))
+                .andExpect(jsonPath("$.data.postDto.authorName").value(author.getName()));
     }
 
 
