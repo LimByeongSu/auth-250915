@@ -4,6 +4,7 @@ package com.rest1.domain.member.member.controller;
 import com.rest1.domain.member.member.dto.MemberDto;
 import com.rest1.domain.member.member.entity.Member;
 import com.rest1.domain.member.member.service.MemberService;
+import com.rest1.global.exception.ServiceException;
 import com.rest1.global.rsData.RsData;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -47,6 +48,11 @@ public class ApiV1MemberController {
     public RsData<JoinResBody> join(
             @RequestBody @Valid JoinReqBody reqBody
     ){
+        memberService.findByUsername(reqBody.username)
+                .ifPresent((Member m) ->{
+                        throw new ServiceException("409-1", "이미 존재하는 아이디입니다.");
+                });
+
 
         Member member = memberService.join(reqBody.username, reqBody.password, reqBody.nickname);
 
