@@ -6,6 +6,7 @@ import com.rest1.domain.post.comment.dto.CommentDto;
 import com.rest1.domain.post.comment.entity.Comment;
 import com.rest1.domain.post.post.entity.Post;
 import com.rest1.domain.post.post.service.PostService;
+import com.rest1.global.Rq.Rq;
 import com.rest1.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,6 +27,7 @@ public class ApiV1CommentController {
 
     private final PostService postService;
     private final MemberService memberService;
+    private final Rq rq;
 
     @GetMapping(value = "/{postId}/comments")
     @Operation(summary = "다건 조회")
