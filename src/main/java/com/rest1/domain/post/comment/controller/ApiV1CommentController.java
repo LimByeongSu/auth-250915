@@ -60,7 +60,12 @@ public class ApiV1CommentController {
             @PathVariable Long commentId
     ) {
 
+        Member actor = rq.getActor();
         Post post = postService.findById(postId).get();
+
+        Comment comment = post.findCommentById(commentId).get();
+        comment.checkActorDelete(actor);
+
         postService.deleteComment(post, commentId);
 
         return new RsData<>(
@@ -87,12 +92,15 @@ public class ApiV1CommentController {
     public RsData<CommentWriteResBody> createItem(
             @PathVariable Long postId,
             @RequestBody @Valid CommentWriteReqBody reqBody,
-            @RequestParam @NotBlank @Size(min = 2, max = 100) String username
+           // @RequestParam @NotBlank @Size(min = 2, max = 100) String username
     ) {
 
-        Member author = memberService.findByUsername(username).get();
+
+
+        //Member author = memberService.findByUsername(username).get();
+        Member actor = rq.getActor();
         Post post = postService.findById(postId).get();
-        Comment comment = postService.writeComment(author, post, reqBody.content);
+        Comment comment = postService.writeComment(actor, post, reqBody.content);
 
         postService.flush();
 
@@ -122,7 +130,12 @@ public class ApiV1CommentController {
             @RequestBody @Valid CommentWriteReqBody reqBody
     ) {
 
+        Member actor = rq.getActor();
+
         Post post = postService.findById(postId).get();
+        Comment comment = post.findCommentById(commentId).get();
+        comment.checkActorModify(actor);
+
         postService.modifyComment(post, commentId, reqBody.content);
 
         return new RsData<>(
