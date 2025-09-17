@@ -152,9 +152,12 @@ public class ApiV1PostControllerTest {
         String title = "제목 수정";
         String content = "내용 수정";
 
+        Member member = memberRepository.findByUsername("user1").get();
+
         ResultActions resultActions = mvc
                 .perform(
                         put("/api/v1/posts/%d".formatted(targetId))
+                                .header("Authorization", "Bearer %s".formatted(member.getApiKey()))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
@@ -185,9 +188,12 @@ public class ApiV1PostControllerTest {
     void t5() throws Exception {
         long targetId = 1;
 
+        Member author = memberRepository.findByUsername("user1").get();
+
         ResultActions resultActions = mvc
                 .perform(
                         delete("/api/v1/posts/%d".formatted(targetId))
+                                .header("Authorization", "Bearer %s".formatted(author.getApiKey()))
                 )
                 .andDo(print());
 

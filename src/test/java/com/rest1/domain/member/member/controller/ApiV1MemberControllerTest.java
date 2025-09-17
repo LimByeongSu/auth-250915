@@ -129,4 +129,6 @@ public class ApiV1MemberControllerTest {
                 .andExpect(jsonPath("$.data.memberDto.modifyDate").value(member.getModifyDate().toString()))
                 .andExpect(jsonPath("$.data.memberDto.name").value(member.getName()));
     }
+
+
 }
