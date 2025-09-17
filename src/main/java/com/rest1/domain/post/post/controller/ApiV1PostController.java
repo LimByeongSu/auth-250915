@@ -6,7 +6,6 @@ import com.rest1.domain.post.post.dto.PostDto;
 import com.rest1.domain.post.post.entity.Post;
 import com.rest1.domain.post.post.service.PostService;
 import com.rest1.global.Rq.Rq;
-import com.rest1.global.exception.ServiceException;
 import com.rest1.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -60,17 +59,14 @@ public class ApiV1PostController {
     @Operation(summary = "글 삭제")
     public RsData<Void> deleteItem(
             @PathVariable Long id
-            //@RequestHeader("Authorization") @NotBlank @Size(min=30, max=50) String apiKey
     ) {
-        //String authorization = apiKey.replace("Bearer ", "");
-
-        //Member actor = memberService.findByApiKey(authorization).orElseThrow(() -> new ServiceException("401-1", "API 키가 올바르지 않습니다."));
-
+        //인증
         Member actor = rq.getActor();
-
         Post post = postService.findById(id).get();
-        if(!actor.equals(post.getAuthor())) throw new ServiceException("403-1", "삭제 권한이 없습니다.");
-
+        
+        //인가
+        //if(!actor.equals(post.getAuthor())) throw new ServiceException("403-1", "삭제 권한이 없습니다.");
+        post.checkActorDelete(actor);
         postService.delete(post);
 
         return new RsData<Void>(
@@ -150,9 +146,10 @@ public class ApiV1PostController {
 
         //권한 체크( 인가 )
         Post post = postService.findById(id).get();
-        if( ! actor.equals(post.getAuthor())){
+        post.checkActorModify(actor);
+        /*if( ! actor.equals(post.getAuthor())){
             throw new ServiceException("403-1", "수정 권한이 없습니다.");
-        }
+        }*/
 
 
         //수정 로직

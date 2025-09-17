@@ -13,15 +13,11 @@ import org.springframework.web.context.annotation.RequestScope;
 @AllArgsConstructor
 public class Rq {
 
-
     private final MemberService memberService;
     private final HttpServletRequest request;   //요청마다 Rq가 생성되기 때문에 요청마다 api에 맞는 request값이 들어옴
     
-    
     public Member getActor() {
         // HttpServletRequest request 에서 요청에 대한 header와 응답이 나옴
-
-
 
         String authorization = request.getHeader("Authorization");
 

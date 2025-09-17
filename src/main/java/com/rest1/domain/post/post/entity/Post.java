@@ -2,6 +2,7 @@ package com.rest1.domain.post.post.entity;
 
 import com.rest1.domain.member.member.entity.Member;
 import com.rest1.domain.post.comment.entity.Comment;
+import com.rest1.global.exception.ServiceException;
 import com.rest1.global.jpa.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -57,5 +58,18 @@ public class Post extends BaseEntity {
         return comments.stream()
                 .filter(c -> c.getId().equals(commentId))
                 .findFirst();
+    }
+
+    public void checkActorModify(Member actor) {
+        if(!this.author.getId().equals(actor.getId())) {
+            throw new ServiceException("403-1", "수정 권한이 없습니다.");
+        }
+    }
+
+    public void checkActorDelete(Member actor) {
+        if(!this.author.getId().equals(actor.getId())) {
+            throw new ServiceException("403-2", "삭제 권한이 없습니다.");
+        }
+
     }
 }
