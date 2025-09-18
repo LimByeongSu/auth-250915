@@ -68,4 +68,13 @@ public class Rq {
         response.addCookie(cookie);
     }
 
+    public void deleteCookie(String name) {   //진짜 쿠키를 삭제하는게 아니라 기간이 0인걸로 바꿔치기 하는것
+        Cookie cookie = new Cookie(name, "");   //기존에 apiKey라는 쿠키가 있으면 새로들어온 쿠키로 바꿔치기됨
+        cookie.setHttpOnly(true);
+        cookie.setDomain("localhost");
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+
+        response.addCookie(cookie);
+    }
 }
