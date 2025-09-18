@@ -39,9 +39,14 @@ public class Rq {
     }
 
     public void addCookie(String name, String value){
-        response.addCookie( //쿠키 작성
-                new Cookie(name, value)
-        );
+
+        Cookie cookie = new Cookie(name, value);
+        cookie.setDomain("localhost");
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);   //보안 옵션 켜기, XSS공격 방지
+
+
+        response.addCookie(cookie);
     }
 
 }
