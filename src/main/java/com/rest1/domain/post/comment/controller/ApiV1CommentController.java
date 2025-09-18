@@ -91,7 +91,7 @@ public class ApiV1CommentController {
     @Operation(summary = "댓글 작성")
     public RsData<CommentWriteResBody> createItem(
             @PathVariable Long postId,
-            @RequestBody @Valid CommentWriteReqBody reqBody,
+            @RequestBody @Valid CommentWriteReqBody reqBody
            // @RequestParam @NotBlank @Size(min = 2, max = 100) String username
     ) {
 
