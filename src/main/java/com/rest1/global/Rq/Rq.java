@@ -21,17 +21,36 @@ public class Rq {
     public Member getActor() {
         // HttpServletRequest request 에서 요청에 대한 header와 응답이 나옴
 
+        String apiKey=null;
         String authorization = request.getHeader("Authorization");
 
-        if(authorization == null || authorization.isEmpty()) {
-            throw new ServiceException("401-1", "헤더에 인증 정보가 없습니다.");
+        //헤더에 authorization이 없다면 에러를 던졌음 (헤더 방식만 고려함)
+        //그러나 이젠 쿠키가 있기때문에 헤더가 없더라도 인증이 가능해야함
+        if(authorization != null && !authorization.isEmpty()){ // 헤더 방식
+            if(!authorization.startsWith("Bearer ")) {
+                throw new ServiceException("401-2", "헤더의 인증 정보 형식이 올바르지 않습니다.");
+            }
+            apiKey = authorization.replace("Bearer ", "");
+            
+        }else{  //쿠키 방식 -> else인걸 보면 알겠지만 헤더가 없으면 여기로 오는 것이다.
+            Cookie[] cookies = request.getCookies();
+
+            if(cookies == null){    //헤더도 없는데 쿠키도 없음
+                throw new ServiceException("401-1", "인증 정보가 없습니다.");
+            }
+
+            for(Cookie cookie : cookies){
+                if(cookie.getName().equals("apiKey")){
+                    apiKey = cookie.getValue();
+                    break;
+                }
+
+            }
+
         }
 
-        if(!authorization.startsWith("Bearer ")) {
-            throw new ServiceException("401-2", "헤더의 인증 정보 형식이 올바르지 않습니다.");
-        }
 
-        Member actor = memberService.findByApiKey(authorization.replace("Bearer ", ""))
+        Member actor = memberService.findByApiKey(apiKey)
                 .orElseThrow(() -> new ServiceException("401-3", "API 키가 올바르지 않습니다."));
 
 
