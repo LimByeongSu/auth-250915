@@ -3,7 +3,9 @@ package com.rest1.global.Rq;
 import com.rest1.domain.member.member.entity.Member;
 import com.rest1.domain.member.member.service.MemberService;
 import com.rest1.global.exception.ServiceException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +16,7 @@ public class Rq {
 
     private final MemberService memberService;
     private final HttpServletRequest request;  //요청마다 Rq가 생성되기 때문에 요청마다 api에 맞는 request값이 들어옴
+    private final HttpServletResponse response;
 
     public Member getActor() {
         // HttpServletRequest request 에서 요청에 대한 header와 응답이 나옴
@@ -33,6 +36,12 @@ public class Rq {
 
 
         return actor;
+    }
+
+    public void addCookie(String name, String value){
+        response.addCookie( //쿠키 작성
+                new Cookie(name, value)
+        );
     }
 
 }
