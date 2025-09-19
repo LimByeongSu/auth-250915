@@ -16,7 +16,8 @@ public class AuthTokenService {
     @Value("${custom.jwt.expireSeconds}")
     private long expireSeconds;
 
-    public String genAccessToken(Member member) {
+    //접근 제어자를 적지 않으면 default 접근제어자가 적용되고 같은 패키지 에서만 사용할 수 있게된다.
+    String genAccessToken(Member member) {
 
         return Ut.jwt.toString(
                 secretPattern,
@@ -25,7 +26,8 @@ public class AuthTokenService {
         );
     }
 
-    public Map<String, Object> payloadOrNull(String jwt) {
+    //접근 제어자를 적지 않으면 default 접근제어자가 적용되고 같은 패키지 에서만 사용할 수 있게된다.
+    Map<String, Object> payloadOrNull(String jwt) {
         Map<String, Object> payload = Ut.jwt.payloadOrNull(jwt, secretPattern);
 
         if(payload == null) {

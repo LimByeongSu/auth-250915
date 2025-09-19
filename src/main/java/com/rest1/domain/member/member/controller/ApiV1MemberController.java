@@ -3,6 +3,7 @@ package com.rest1.domain.member.member.controller;
 
 import com.rest1.domain.member.member.dto.MemberDto;
 import com.rest1.domain.member.member.entity.Member;
+import com.rest1.domain.member.member.service.AuthTokenService;
 import com.rest1.domain.member.member.service.MemberService;
 import com.rest1.global.Rq.Rq;
 import com.rest1.global.exception.ServiceException;
@@ -21,6 +22,7 @@ public class ApiV1MemberController {
 
     private final MemberService memberService;
     private final Rq rq;
+    private final AuthTokenService authTokenService;
 
     record JoinReqBody( //받아야하는 데이터 (요청용)
             @NotBlank
@@ -74,7 +76,8 @@ public class ApiV1MemberController {
 
     record LoginResBody( //응답용
         MemberDto memberDto,
-        String apiKey
+        String apiKey,
+        String accessToken
     ){
 
     }
@@ -93,14 +96,18 @@ public class ApiV1MemberController {
             throw new ServiceException("401-2", "비밀번호가 일치하지 않습니다.");
         }
 
+        String accessToken = memberService.genAccessToken(member);
+
         rq.addCookie("apiKey", member.getApiKey()); //쿠키 생성
+        rq.addCookie("accessToken", accessToken);
 
         return new RsData(
                 "200-1",
                 "%s님 환영합니다.".formatted(reqBody.username),
                 new LoginResBody(
                     new MemberDto(member),
-                    member.getApiKey()  //apiKey를 사용하는 방식은 남겨놓는다. 모바일에서도 사용할 것 고려
+                    member.getApiKey(),  //apiKey를 사용하는 방식은 남겨놓는다. 모바일에서도 사용할 것 고려
+                    accessToken
 
                 )
 
