@@ -62,6 +62,7 @@ public class AuthTokenServiceTest {
                 .signWith(secretKey) // 키 서명
                 .compact();
 
+        //검증하는 코드
         Map<String, Object> parsedPayload = (Map<String, Object>) Jwts
                 .parser()
                 .verifyWith(secretKey)
