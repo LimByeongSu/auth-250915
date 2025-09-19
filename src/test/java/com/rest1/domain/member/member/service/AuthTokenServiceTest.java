@@ -81,10 +81,12 @@ public class AuthTokenServiceTest {
     @Test
     @DisplayName("Ut.jwt.toString 를 통해서 JWT 생성, {name=\"Paul\", age=23}")
     void t3() {
+        Map<String, Object> payload =  Map.of("name", "Paul", "age", 23);
+
         String jwt = Ut.jwt.toString(
                 secretPattern,
                 expireSeconds,
-                Map.of("name", "Paul", "age", 23)
+                payload
         );
 
         assertThat(jwt).isNotBlank();
