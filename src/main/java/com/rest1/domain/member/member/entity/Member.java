@@ -41,4 +41,8 @@ public class Member extends BaseEntity {
     public void updateApiKey(String apiKey){
         this.apiKey = apiKey;
     }
+
+    public boolean isAdmin() {
+        return "admin".equals(this.username);
+    }
 }
