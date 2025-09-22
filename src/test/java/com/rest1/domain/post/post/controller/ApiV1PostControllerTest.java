@@ -4,9 +4,11 @@ import com.rest1.domain.member.member.entity.Member;
 import com.rest1.domain.member.member.repository.MemberRepository;
 import com.rest1.domain.post.post.entity.Post;
 import com.rest1.domain.post.post.repository.PostRepository;
+import com.rest1.standard.ut.Ut;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -14,6 +16,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInRelativeOrder;
@@ -36,6 +40,12 @@ public class ApiV1PostControllerTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Value("${custom.jwt.secretPattern}")
+    private String secretPattern;
+    @Value("${custom.jwt.expireSeconds}")
+    private long expireSeconds;
+
 
     @Test
     @DisplayName("글 다건 조회")
@@ -274,8 +284,41 @@ public class ApiV1PostControllerTest {
     }
 
     @Test
-    @DisplayName("글 수정")
+    @DisplayName("글 작성, 유요한 엑세스 토큰, 잘못된 apiKey")
     void t8() throws Exception {
+        String title = "제목입니다";
+        String content = "내용입니다";
+        Member author = memberRepository.findByUsername("user1").get();
+
+        String accessToken = Ut.jwt.toString(
+                secretPattern,
+                expireSeconds,
+                Map.of("id", author.getId(), "username", author.getUsername())
+        );
+
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/api/v1/posts")
+                                .header("Authorization", "Bearer wrong-api-key %s".formatted(accessToken))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "title": "%s",
+                                            "content": "%s"
+                                        }
+                                        """.formatted(title, content))
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("createItem"))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @DisplayName("글 수정")
+    void t9() throws Exception {
         long targetId = 1;
         String title = "제목 수정";
         String content = "내용 수정";
@@ -313,7 +356,7 @@ public class ApiV1PostControllerTest {
 
     @Test
     @DisplayName("글 삭제")
-    void t9() throws Exception {
+    void t10() throws Exception {
         long targetId = 1;
 
         Member author = memberRepository.findByUsername("user1").get();
@@ -340,7 +383,7 @@ public class ApiV1PostControllerTest {
 
     @Test
     @DisplayName("글 단건 조회, 존재하지 않는 글")
-    void t10() throws Exception {
+    void t11() throws Exception {
         long targetId = Integer.MAX_VALUE;
 
         ResultActions resultActions = mvc
@@ -359,7 +402,7 @@ public class ApiV1PostControllerTest {
 
     @Test
     @DisplayName("글 작성, 올바르지 않은 헤더 형식")
-    void t11() throws Exception {
+    void t12() throws Exception {
         String title = "제목입니다";
         String content = "내용입니다";
 
@@ -389,7 +432,7 @@ public class ApiV1PostControllerTest {
 
     @Test
     @DisplayName("글 작성, 잘못된/없는 API 키")
-    void t12() throws Exception {
+    void t13() throws Exception {
         String title = "제목입니다";
         String content = "내용입니다";
 
@@ -418,7 +461,7 @@ public class ApiV1PostControllerTest {
     }
     @Test
     @DisplayName("글 수정, 권한 체크 - 글 작성자가 아닌 경우")
-    void t13() throws Exception {
+    void t14() throws Exception {
         long targetId = 1;
         String title = "제목 수정";
         String content = "내용 수정";
@@ -450,7 +493,7 @@ public class ApiV1PostControllerTest {
 
     @Test
     @DisplayName("글 삭제, 권한 체크 - 글 작성자가 아닌 경우")
-    void t14() throws Exception {
+    void t15() throws Exception {
         long targetId = 1;
 
         Member author = memberRepository.findByUsername("user2").get();
