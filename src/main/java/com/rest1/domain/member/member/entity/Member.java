@@ -28,9 +28,10 @@ public class Member extends BaseEntity {
 
     }
 
-    public Member(long id, String username) {
+    public Member(Long id, String username, String nickname) {
         this.setId(id);
         this.username = username;
+        this.nickname = nickname;
     }
 
     public String getName(){
