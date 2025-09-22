@@ -203,6 +203,34 @@ public class ApiV1MemberControllerTest {
                 .andExpect(jsonPath("$.data.memberDto.name").value(member.getName()));
     }
 
+    @Test
+    @DisplayName("내 정보, 올바른 apiKey, 만료된(유효하지 않은) accessToken를 넘긴 경우")
+    void t6() throws Exception {
+        Member actor = memberRepository.findByUsername("user1").get();
+        String actorApiKey = actor.getApiKey();
+        
+        String wrongAccessToken = "wrong-access-token"; //이상한 accessToken을 넣었음
 
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/members/me")
+                                .header("Authorization", "Bearer " + actorApiKey +" "+wrongAccessToken)
+                )
+                .andDo(print());
+
+        Member member = memberRepository.findByUsername("user1").get();
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1MemberController.class))
+                .andExpect(handler().methodName("me"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("200-1"))
+                .andExpect(jsonPath("$.msg").value("OK"))
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.data.memberDto.id").value(member.getId()))
+                .andExpect(jsonPath("$.data.memberDto.createDate").value(member.getCreateDate().toString()))
+                .andExpect(jsonPath("$.data.memberDto.modifyDate").value(member.getModifyDate().toString()))
+                .andExpect(jsonPath("$.data.memberDto.name").value(member.getName()));
+    }
 
 }
