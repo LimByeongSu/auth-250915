@@ -124,13 +124,13 @@ public class ApiV1MemberController {
     public RsData<MemberDto> me() {
 
         //인증, 인가를 받고 정보를 보여줘야함 
-        Member actor = memberService.findById(rq.getActor().getId()).get();
+        Member  author = memberService.findById(rq.getActor().getId()).get();
 
         return new RsData(
                 "200-1",
                 "OK",
                 new MeResBody(
-                        new MemberDto(actor)
+                        new MemberDto(author)
                 )
         );
     }
